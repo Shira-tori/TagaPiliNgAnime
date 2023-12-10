@@ -1,7 +1,13 @@
 import requests
-from os import system, name
+import pickle
+from os import system, name, path
 from random import *
 from bs4 import BeautifulSoup
+
+def saveSession(session):
+    with open("session.pkl", "wb") as f:
+        pickle.dump(session, f)
+
 
 def chooseAnime(category):
     animes = category.parent.find_all('span', class_='js-title')
@@ -27,9 +33,14 @@ def chooseAnime(category):
 
 def seasonal_anime():
     url = 'https://myanimelist.net/anime/season'
+    if not path.exists("session.pkl"):
+        session = requests.Session()
+    else:
+        with open("session.pkl", "rb") as f:
+            session = pickle.load(f)
 
-    print("Loading...")
-    response = requests.get(url)
+    print("Loading...", end='', flush=True)
+    response = session.get(url)
     print("Done!\n\n")
 
     if response.status_code == 200:
@@ -47,11 +58,16 @@ def seasonal_anime():
                 choice = int(input(" > "))
             except ValueError:
                 print("Enter a number. ")
+                input("Please press any key...")
+                system('cls' if name == 'nt' else 'clear')
                 continue
             if choice < 0 or choice > len(categories)+1:
                 print("Enter a valid choice.")
+                input("Please press any key...")
+                system('cls' if name == 'nt' else 'clear')
                 continue
             if choice == 7:
+                saveSession(session)
                 exit(0)
             chooseAnime(categories[choice-1])
 
