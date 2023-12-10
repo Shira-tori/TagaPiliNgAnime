@@ -1,5 +1,5 @@
 import requests
-from os import system
+from os import system, name
 from random import *
 from bs4 import BeautifulSoup
 
@@ -9,7 +9,7 @@ def chooseAnime(category):
     rating = category.parent.find_all('span', class_='js-score')
     date = category.parent.find_all('div', class_='info')
 
-    rand_num = randrange(0, len(animes)-1)
+    rand_num = randrange(len(animes))
 
     chosen_anime = animes[rand_num].text.strip()
     chosen_anime_synopsis = synopsis[rand_num].text.strip()
@@ -23,8 +23,7 @@ def chooseAnime(category):
 
     input("Please press any key to continue...")
 
-    #TODO: Find a way to clear screen regardless of OS
-    system("clear")
+    system('cls' if name == 'nt' else 'clear')
 
 def seasonal_anime():
     url = 'https://myanimelist.net/anime/season'
@@ -38,15 +37,15 @@ def seasonal_anime():
         soup = BeautifulSoup(response.text, 'html.parser')
         categories = soup.find_all('div', class_='anime-header')
         while True:
-            for i in range(len(categories)):
-                print(f'{i+1}. {categories[i].text}')
+            for i, category in enumerate(categories):
+                print(f'{i+1}. {category.text}')
 
             print('7. Exit')
             print("\n")
             print("What category do you want?")
             try:
                 choice = int(input(" > "))
-            except:
+            except ValueError:
                 print("Enter a number. ")
                 continue
             if choice < 0 or choice > len(categories)+1:
