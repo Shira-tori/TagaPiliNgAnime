@@ -3,15 +3,15 @@ import json
 import asyncio
 import jikanpy
 
-async def chooseRandAnime(jikan):
+def chooseRandAnime(jikan):
     print("Picking random Anime...")
     try: 
         anime_json = jikan.random(type='anime')
         print("Successfully picked an anime.")
         print(anime_json['data']['title'])
-    except:
-        input("There is a problem with your network.")
-        mainMenu()
+    except Exception as e:
+        input(e)
+        return
 
 def initJikan():
     try:
@@ -32,7 +32,7 @@ async def mainMenu():
             match choice:
                 case 1:
                     jikan = initJikan();
-                    await chooseRandAnime(jikan)
+                    chooseRandAnime(jikan)
                 case 2:
                     print("Exiting...")
                     exit(0)

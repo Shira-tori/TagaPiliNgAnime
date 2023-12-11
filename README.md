@@ -1,4 +1,3 @@
 # TagaPiliNgAnime
 
-Para sa mga tamad na tinatamad na pumunta ng MAL
-
+Picks a random anime for you using JikanPy.
