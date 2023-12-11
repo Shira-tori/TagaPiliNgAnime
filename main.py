@@ -1,97 +1,50 @@
-import requests
-import pickle
-from os import system, name, path
-from random import *
-from bs4 import BeautifulSoup
+import os
+import json
+import asyncio
+import jikanpy
 
-def saveSession(session):
-    with open("session.pkl", "wb") as f:
-        pickle.dump(session, f)
+async def chooseRandAnime(jikan):
+    print("Picking random Anime...")
+    try: 
+        anime_json = jikan.random(type='anime')
+        print("Successfully picked an anime.")
+        print(anime_json['data']['title'])
+    except:
+        input("There is a problem with your network.")
+        mainMenu()
 
+def initJikan():
+    try:
+        jikan = jikanpy.Jikan()
+        print("Successfully initialized JikanPy")
+        return jikan
+    except NetworkError:
+        print("There is a problem with your network.")
+        exit(1)
 
-def chooseAnime(category):
-    animes = category.parent.find_all('span', class_='js-title')
-    synopsis = category.parent.find_all('p', class_='preline')
-    rating = category.parent.find_all('span', class_='js-score')
-    date = category.parent.find_all('div', class_='info')
+async def mainMenu():
+    while True:
+        print(" TAGA PILI NG ANIME ")
+        print("1. Give Random Anime.")
+        print("2. Exit.")
+        try: 
+            choice = int(input("> "))
+            match choice:
+                case 1:
+                    jikan = initJikan();
+                    await chooseRandAnime(jikan)
+                case 2:
+                    print("Exiting...")
+                    exit(0)
+                case _:
+                    input("Not in the choices.")
+                    os.system('cls' if os.name == 'nt' else 'clear')
 
-    rand_num = randrange(len(animes))
-
-    chosen_anime = animes[rand_num].text.strip()
-    chosen_anime_synopsis = synopsis[rand_num].text.strip()
-    chosen_anime_rating = rating[rand_num].text.strip()
-    chosen_anime_date = date[rand_num].span.text.strip()
-    
-    print(f'Anime: {chosen_anime}')
-    print(f'Rating: {chosen_anime_rating}')
-    print(f'Date: {chosen_anime_date}')
-    print(f'Synopsis: {chosen_anime_synopsis}')
-
-    input("Please press any key to continue...")
-
-    system('cls' if name == 'nt' else 'clear')
-
-def seasonal_anime():
-    url = 'https://myanimelist.net/anime/season'
-    if not path.exists("session.pkl"):
-        session = requests.Session()
-    else:
-        with open("session.pkl", "rb") as f:
-            session = pickle.load(f)
-
-    print("Loading...", end='', flush=True)
-    response = session.get(url)
-    print("Done!\n\n")
-
-    if response.status_code == 200:
-        seed()
-        soup = BeautifulSoup(response.text, 'html.parser')
-        categories = soup.find_all('div', class_='anime-header')
-        while True:
-            for i, category in enumerate(categories):
-                print(f'{i+1}. {category.text}')
-
-            print('7. Exit')
-            print("\n")
-            print("What category do you want?")
-            try:
-                choice = int(input(" > "))
-            except ValueError:
-                print("Enter a number. ")
-                input("Please press any key...")
-                system('cls' if name == 'nt' else 'clear')
-                continue
-            if choice < 0 or choice > len(categories)+1:
-                print("Enter a valid choice.")
-                input("Please press any key...")
-                system('cls' if name == 'nt' else 'clear')
-                continue
-            if choice == 7:
-                saveSession(session)
-                exit(0)
-            chooseAnime(categories[choice-1])
-
-    else:
-        print("Bobo, wala ka atang internet.")
-
-def main_menu():
-    system("clear")
-    ascii_art = '''
- /$$$$$$$$                            /$$$$$$$  /$$ /$$ /$$ /$$   /$$            /$$$$$$            /$$                        
-|__  $$__/                           | $$__  $$|__/| $$|__/| $$$ | $$           /$$__  $$          |__/                        
-   | $$  /$$$$$$   /$$$$$$   /$$$$$$ | $$  \ $$ /$$| $$ /$$| $$$$| $$  /$$$$$$ | $$  \ $$ /$$$$$$$  /$$ /$$$$$$/$$$$   /$$$$$$ 
-   | $$ |____  $$ /$$__  $$ |____  $$| $$$$$$$/| $$| $$| $$| $$ $$ $$ /$$__  $$| $$$$$$$$| $$__  $$| $$| $$_  $$_  $$ /$$__  $$
-   | $$  /$$$$$$$| $$  \ $$  /$$$$$$$| $$____/ | $$| $$| $$| $$  $$$$| $$  \ $$| $$__  $$| $$  \ $$| $$| $$ \ $$ \ $$| $$$$$$$$
-   | $$ /$$__  $$| $$  | $$ /$$__  $$| $$      | $$| $$| $$| $$\  $$$| $$  | $$| $$  | $$| $$  | $$| $$| $$ | $$ | $$| $$_____/
-   | $$|  $$$$$$$|  $$$$$$$|  $$$$$$$| $$      | $$| $$| $$| $$ \  $$|  $$$$$$$| $$  | $$| $$  | $$| $$| $$ | $$ | $$|  $$$$$$$
-   |__/ \_______/ \____  $$ \_______/|__/      |__/|__/|__/|__/  \__/ \____  $$|__/  |__/|__/  |__/|__/|__/ |__/ |__/ \_______/
-                  /$$  \ $$                                           /$$  \ $$                                                
-                 |  $$$$$$/                                          |  $$$$$$/                                                
-                  \______/                                            \______/                                                 
-         '''
-    print(ascii_art)
-    print("\n")
+        except ValueError:
+            input("Not a valid choice. Try again.")
+            os.system('cls' if os.name == 'nt' else 'clear')
+        
 
 if __name__ == '__main__':
-    main_menu()
-    seasonal_anime()
+    asyncio.run(mainMenu())
+
