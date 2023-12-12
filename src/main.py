@@ -2,6 +2,9 @@ import os
 import jikanpy
 from sys import exit
 
+def clearScreen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
 def chooseRandAnime(jikan):
     print("Picking random Anime...")
     try: 
@@ -12,6 +15,7 @@ def chooseRandAnime(jikan):
         print(f"Episodes: {anime_json['data']['episodes']}")
         print(f"Rating: {anime_json['data']['score']}")
         print(f"Synopsis: {anime_json['data']['synopsis']}\n")
+        input("Press any key to continue...")
     except Exception as e:
         input(e)
         return
@@ -27,6 +31,7 @@ def initJikan():
 
 def mainMenu():
     while True:
+        clearScreen()
         print(" TAGA PILI NG ANIME ")
         print("1. Give Random Anime.")
         print("2. Exit.")
@@ -41,12 +46,11 @@ def mainMenu():
                     exit(0)
                 case _:
                     input("Not in the choices.")
-                    os.system('cls' if os.name == 'nt' else 'clear')
+                    clearScreen()
 
         except ValueError:
             input("Not a valid choice. Try again.")
-            os.system('cls' if os.name == 'nt' else 'clear')
-        
+            clearScreen() 
 
 if __name__ == '__main__':
     mainMenu()
