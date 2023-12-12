@@ -1,6 +1,4 @@
 import os
-import json
-import asyncio
 import jikanpy
 from sys import exit
 
@@ -8,8 +6,12 @@ def chooseRandAnime(jikan):
     print("Picking random Anime...")
     try: 
         anime_json = jikan.random(type='anime')
-        print("Successfully picked an anime.")
-        print(anime_json['data']['title'])
+        print("Successfully picked an anime.\n")
+        print(f"Title: {anime_json['data']['title']}")
+        print(f"Status: {anime_json['data']['status']}")
+        print(f"Episodes: {anime_json['data']['episodes']}")
+        print(f"Rating: {anime_json['data']['score']}")
+        print(f"Synopsis: {anime_json['data']['synopsis']}\n")
     except Exception as e:
         input(e)
         return
@@ -19,11 +21,11 @@ def initJikan():
         jikan = jikanpy.Jikan()
         print("Successfully initialized JikanPy")
         return jikan
-    except NetworkError:
-        print("There is a problem with your network.")
+    except Exception as e:
+        input(e)
         exit(1)
 
-async def mainMenu():
+def mainMenu():
     while True:
         print(" TAGA PILI NG ANIME ")
         print("1. Give Random Anime.")
@@ -47,5 +49,5 @@ async def mainMenu():
         
 
 if __name__ == '__main__':
-    asyncio.run(mainMenu())
+    mainMenu()
 
